@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Employee
 from .serializers import EmployeeSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 
 
 # Create your views here.
@@ -19,7 +21,8 @@ class EmployeeView(APIView):
 
         return Response({'msg':'Employee added Successfully.'},status = status.HTTP_201_CREATED)
 
-    def get(self, request, id=None, emp_fname=None):
+    def get(self, request, id=None, fname=None):
+        print(fname,'------------------')
         if id is not None:
             try:
                 employee_data = Employee.objects.get(id = id)   
@@ -28,8 +31,8 @@ class EmployeeView(APIView):
             except:
                 return Response({'msg':'Id does not exists!'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if emp_fname is not None:
-            all_emp = Employee.objects.filter(emp_fname = emp_fname).values()
+        if fname is not None:
+            all_emp = Employee.objects.filter(emp_fname__contains = fname)
             serializer = self.serializer_class(all_emp, many=True)
             response = {
                 'success': True,
